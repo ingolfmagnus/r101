@@ -1,14 +1,14 @@
 package inf101.v19.rogue101.examples;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import inf101.v19.gfx.gfxmode.ITurtle;
 import inf101.v19.grid.GridDirection;
 import inf101.v19.rogue101.game.IGame;
 import inf101.v19.rogue101.objects.IItem;
 import inf101.v19.rogue101.objects.INonPlayer;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class Rabbit implements INonPlayer {
     private int food = 0;
@@ -44,7 +44,12 @@ public class Rabbit implements INonPlayer {
         }
         if (!possibleMoves.isEmpty()) {
             Collections.shuffle(possibleMoves);
-            game.move(possibleMoves.get(0));
+            GridDirection bestDir = possibleMoves.get(0);
+            for (GridDirection dir : possibleMoves)
+                for (IItem item : game.getMap().getItems(game.getMap().go(game.getLocation(), dir)))
+                    if (item instanceof Carrot)
+                        bestDir = dir;
+            game.move(bestDir);
         }
     }
 
