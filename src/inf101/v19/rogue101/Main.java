@@ -1,8 +1,5 @@
 package inf101.v19.rogue101;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
 import inf101.v19.gfx.Screen;
 import inf101.v19.gfx.gfxmode.ITurtle;
 import inf101.v19.gfx.textmode.Printer;
@@ -17,6 +14,9 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 public class Main extends Application {
     // you might want to tune these options
@@ -93,69 +93,7 @@ public class Main extends Application {
         if (grid)
             printer.drawCharCells();
         printer.setAutoScroll(false);
-        screen.setKeyPressedHandler((KeyEvent event) -> {
-                KeyCode code = event.getCode();
-                if (event.isShortcutDown()) {
-                    if (code == KeyCode.Q) {
-                        System.exit(0);
-                    } else if (code == KeyCode.R) {
-                        printer.cycleMode(true);
-                        if (grid)
-                            printer.drawCharCells();
-                        game.draw();
-                        printer.redrawDirty();
-                        return true;
-                    } else if (code == KeyCode.A) {
-                        screen.cycleAspect();
-                        if (grid)
-                            printer.drawCharCells();
-                        return true;
-                    } else if (code == KeyCode.G) {
-                        grid = !grid;
-                        if (grid)
-                            printer.drawCharCells();
-                        else
-                            screen.clearBackground();
-                        return true;
-                    } else if (code == KeyCode.F) {
-                        screen.setFullScreen(!screen.isFullScreen());
-                        return true;
-                    } else if (code == KeyCode.L) {
-                        printer.redrawTextPage();
-                        return true;
-                    }
-                } else if (code == KeyCode.ENTER) {
-                    try {
-                        doTurn();
-                    } catch (Exception e) {
-                        printer.printAt(1, 25, "Exception: " + e.getMessage(), Color.RED);
-                        e.printStackTrace();
-                    }
-                    return true;
-                } else {
-                    try {
-                        game.keyPressed(code);
-                        doTurn();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        try {
-                            StringWriter sw = new StringWriter();
-                            PrintWriter writer = new PrintWriter(sw);
-                            e.printStackTrace(writer);
-                            writer.close();
-                            String trace = sw.toString().split("\n")[0];
-                            game.displayDebug("Exception: " + trace);
-                        } catch (Exception e2) {
-                            System.err.println("Also got this exception trying to display the previous one");
-                            e2.printStackTrace();
-                            game.displayDebug("Exception: " + e.getMessage());
-                        }
-                    }
-                    printer.redrawDirty();
-                    return true;
-                }
-                return false;
-            });
+        screen.setKeyPressedHandler(this::dispatchKeystroke);
         /*
          * screen.setKeyTypedHandler((KeyEvent event) -> { if (event.getCharacter() !=
          * KeyEvent.CHAR_UNDEFINED) { printer.print(event.getCharacter()); return true;
@@ -206,4 +144,68 @@ public class Main extends Application {
         + "#.C.... ..... ......... .R..R....R...R.#\n" //
         + "########################################\n" //
 	;
+
+    private boolean dispatchKeystroke(KeyEvent event) {
+        KeyCode code = event.getCode();
+        if (event.isShortcutDown()) {
+            if (code == KeyCode.Q) {
+                System.exit(0);
+            } else if (code == KeyCode.R) {
+                printer.cycleMode(true);
+                if (grid)
+                    printer.drawCharCells();
+                game.draw();
+                printer.redrawDirty();
+                return true;
+            } else if (code == KeyCode.A) {
+                screen.cycleAspect();
+                if (grid)
+                    printer.drawCharCells();
+                return true;
+            } else if (code == KeyCode.G) {
+                grid = !grid;
+                if (grid)
+                    printer.drawCharCells();
+                else
+                    screen.clearBackground();
+                return true;
+            } else if (code == KeyCode.F) {
+                screen.setFullScreen(!screen.isFullScreen());
+                return true;
+            } else if (code == KeyCode.L) {
+                printer.redrawTextPage();
+                return true;
+            }
+        } else if (code == KeyCode.ENTER) {
+            try {
+                doTurn();
+            } catch (Exception e) {
+                printer.printAt(1, 25, "Exception: " + e.getMessage(), Color.RED);
+                e.printStackTrace();
+            }
+            return true;
+        } else {
+            try {
+                game.keyPressed(code);
+                doTurn();
+            } catch (Exception e) {
+                e.printStackTrace();
+                try {
+                    StringWriter sw = new StringWriter();
+                    PrintWriter writer = new PrintWriter(sw);
+                    e.printStackTrace(writer);
+                    writer.close();
+                    String trace = sw.toString().split("\n")[0];
+                    game.displayDebug("Exception: " + trace);
+                } catch (Exception e2) {
+                    System.err.println("Also got this exception trying to display the previous one");
+                    e2.printStackTrace();
+                    game.displayDebug("Exception: " + e.getMessage());
+                }
+            }
+            printer.redrawDirty();
+            return true;
+        }
+        return false;
+    }
 }
