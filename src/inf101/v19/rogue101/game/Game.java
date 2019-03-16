@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.function.Supplier;
 
+import inf101.v19.gfx.IPaintLayer;
 import inf101.v19.gfx.Screen;
 import inf101.v19.gfx.gfxmode.ITurtle;
 import inf101.v19.gfx.gfxmode.TurtlePainter;
@@ -58,6 +59,7 @@ public class Game implements IGame {
     private final ITurtle painter;
     private final Printer printer;
     private int numPlayers = 0;
+    private List<Carrot> carrots = new ArrayList<>();
 
     public Game(Screen screen, ITurtle painter, Printer printer) {
         this.painter = painter;
@@ -137,6 +139,7 @@ public class Game implements IGame {
      * @return True if the game should wait for more user input
      */
     public boolean doTurn() {
+        doCarrotPlanting();
         do {
             if (actors.isEmpty()) {
                 // System.err.println("new turn!");
@@ -144,6 +147,11 @@ public class Game implements IGame {
                 // no one in the queue, we're starting a new turn!
                 // first collect all the actors:
                 beginTurn();
+            }
+
+            // Do the Carrots turns:
+            for (Carrot carrotItem : carrots){
+                carrotItem.doTurn(this);
             }
 
             // process actors one by one; for the IPlayer, we return and wait for keypresses
@@ -195,11 +203,27 @@ public class Game implements IGame {
         return true;
     }
 
+    private void doCarrotPlanting() {
+        Random R = new Random();
+        if (R.nextInt(100) < 20) {
+            ILocation randomLoc = null;
+            do {
+                int randomX = R.nextInt(map.getWidth());
+                int randomY = R.nextInt(map.getHeight());
+                randomLoc = map.getLocation(randomX, randomY);
+            } while (map.getItems(randomLoc).size() != 0);
+            Carrot newCarrot = new Carrot();
+            map.add(randomLoc, newCarrot);
+        }
+    }
+
     /**
      * Go through the map and collect all the actors.
      */
     private void beginTurn() {
         numPlayers = 0;
+        // Collect carrots each turn
+        carrots.clear();
         // this extra fancy iteration over each map location runs *in parallel* on
         // multicore systems!
         // that makes some things more tricky, hence the "synchronized" block and
@@ -208,7 +232,7 @@ public class Game implements IGame {
         // "parallelStream()" by "stream()", because weird things can happen when many
         // things happen
         // at the same time! (or do INF214 or DAT103 to learn about locks and threading)
-        map.getArea().parallelStream().forEach((loc) -> { // will do this for each location in map
+        map.getArea().stream().forEach((loc) -> { // will do this for each location in map
                 List<IItem> list = map.getAllModifiable(loc); // all items at loc
                 Iterator<IItem> li = list.iterator(); // manual iterator lets us remove() items
                 while (li.hasNext()) { // this is what "for(IItem item : list)" looks like on the inside
@@ -229,6 +253,8 @@ public class Game implements IGame {
                         }
                     } else if (item instanceof IActor) {
                         actors.add((IActor) item); // add other actors to the end of the list
+                    } else if (item instanceof Carrot) {
+                        carrots.add((Carrot)item);
                     }
                 }
             });
