@@ -270,7 +270,7 @@ public class Game implements IGame {
         case "C":
             return new Carrot();
         case "@":
-            // TODO: add Player
+            return new Player();
         case " ":
             return null;
         default:
