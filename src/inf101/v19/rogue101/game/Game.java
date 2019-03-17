@@ -1,15 +1,5 @@
 package inf101.v19.rogue101.game;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.function.Supplier;
-
-import inf101.v19.gfx.IPaintLayer;
 import inf101.v19.gfx.Screen;
 import inf101.v19.gfx.gfxmode.ITurtle;
 import inf101.v19.gfx.gfxmode.TurtlePainter;
@@ -24,15 +14,13 @@ import inf101.v19.rogue101.map.GameMap;
 import inf101.v19.rogue101.map.IGameMap;
 import inf101.v19.rogue101.map.IMapView;
 import inf101.v19.rogue101.map.MapReader;
-import inf101.v19.rogue101.objects.Dust;
-import inf101.v19.rogue101.objects.IActor;
-import inf101.v19.rogue101.objects.IItem;
-import inf101.v19.rogue101.objects.INonPlayer;
-import inf101.v19.rogue101.objects.IPlayer;
-import inf101.v19.rogue101.objects.Wall;
+import inf101.v19.rogue101.objects.*;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
+
+import java.util.*;
+import java.util.function.Supplier;
 
 public class Game implements IGame {
     /**
@@ -139,7 +127,7 @@ public class Game implements IGame {
      * @return True if the game should wait for more user input
      */
     public boolean doTurn() {
-        doCarrotPlanting();
+        doCarrotPlanting(20);
         do {
             if (actors.isEmpty()) {
                 // System.err.println("new turn!");
@@ -203,9 +191,13 @@ public class Game implements IGame {
         return true;
     }
 
-    private void doCarrotPlanting() {
+    /**
+     * With a probability, plant a Carrot
+     * @param percentProbability
+     */
+    private void doCarrotPlanting(int percentProbability) {
         Random R = new Random();
-        if (R.nextInt(100) < 20) {
+        if (R.nextInt(100) < percentProbability) {
             ILocation randomLoc = null;
             do {
                 int randomX = R.nextInt(map.getWidth());
