@@ -372,8 +372,12 @@ public class Game implements IGame {
 
     @Override
     public List<GridDirection> getPossibleMoves() {
-        // TODO
-        throw new UnsupportedOperationException();
+        List<GridDirection> possibleMoves = new ArrayList<>();
+        for (GridDirection dir : GridDirection.FOUR_DIRECTIONS) {
+            if (canGo(dir))
+                possibleMoves.add(dir);
+        }
+        return possibleMoves;
     }
 
     @Override

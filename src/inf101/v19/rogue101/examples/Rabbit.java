@@ -6,7 +6,6 @@ import inf101.v19.rogue101.game.IGame;
 import inf101.v19.rogue101.objects.IItem;
 import inf101.v19.rogue101.objects.INonPlayer;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -37,11 +36,7 @@ public class Rabbit implements INonPlayer {
             }
         }
         // TODO: prøv forskjellige varianter her
-        List<GridDirection> possibleMoves = new ArrayList<>();
-        for (GridDirection dir : GridDirection.FOUR_DIRECTIONS) {
-            if (game.canGo(dir))
-                possibleMoves.add(dir);
-        }
+        List<GridDirection> possibleMoves = game.getPossibleMoves();
         if (!possibleMoves.isEmpty()) {
             Collections.shuffle(possibleMoves);
             GridDirection bestDir = possibleMoves.get(0);
