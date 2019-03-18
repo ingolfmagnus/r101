@@ -263,8 +263,7 @@ public class Game implements IGame {
         case "#":
             return new Wall();
         case ".":
-            // TODO: add Dust
-            return null;
+            return new Dust();
         case "R":
             return new Rabbit();
         case "C":

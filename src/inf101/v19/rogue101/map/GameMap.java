@@ -1,26 +1,16 @@
 package inf101.v19.rogue101.map;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.IdentityHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import inf101.v19.gfx.gfxmode.ITurtle;
 import inf101.v19.gfx.textmode.Printer;
-import inf101.v19.grid.GridDirection;
-import inf101.v19.grid.IArea;
-import inf101.v19.grid.ILocation;
-import inf101.v19.grid.IMultiGrid;
-import inf101.v19.grid.MultiGrid;
+import inf101.v19.grid.*;
 import inf101.v19.rogue101.Main;
 import inf101.v19.rogue101.game.IllegalMoveException;
 import inf101.v19.rogue101.objects.IActor;
 import inf101.v19.rogue101.objects.IItem;
 import inf101.v19.rogue101.objects.Wall;
 import javafx.scene.canvas.GraphicsContext;
+
+import java.util.*;
 
 public class GameMap implements IGameMap {
     /**
@@ -46,6 +36,13 @@ public class GameMap implements IGameMap {
         grid = new MultiGrid<>(width, height);
     }
 
+    /**
+     * Add Item at a location
+     * @param loc
+     *            location to add item to
+     * @param item
+     *            item to be added
+     */
     @Override
     public void add(ILocation loc, IItem item) {
         // keep track of location of all items
@@ -55,8 +52,14 @@ public class GameMap implements IGameMap {
 
         // do the actual adding
         List<IItem> list = grid.get(loc);
-        list.add(item);
-        // TODO: should be sorted!
+
+        int insertAt = 0;
+        for (int i=0;i <  list.size(); i++)
+            if (list.get(i).compareTo(item) <= 0) {
+                insertAt = i;
+                break;
+            }
+        list.add(insertAt, item);
     }
 
     @Override
