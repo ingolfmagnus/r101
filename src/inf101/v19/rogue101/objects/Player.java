@@ -12,6 +12,7 @@ import java.util.List;
 public class Player implements IPlayer {
     private int food = 0;
     private int hp = getMaxHealth();
+    private IItem myItem;
 
 
     public void doTurn(IGame game) {
@@ -71,6 +72,14 @@ public class Player implements IPlayer {
             tryToMove(game, GridDirection.SOUTH);
 
         }
+        else if (key == KeyCode.PAGE_UP) {
+            pickUp(game);
+
+        }
+        else if (key == KeyCode.PAGE_DOWN) {
+            drop(game);
+
+        }
         showStatus(game);
     }
 
@@ -79,14 +88,20 @@ public class Player implements IPlayer {
      * @param game The game engine object
      */
     private void showStatus(IGame game) {
+        StringBuilder s = new StringBuilder();
         if (hp > 0)
-            game.displayStatus("Player health: " + hp + "/" + getMaxHealth());
+            s.append("Player health: " + hp + "/" + getMaxHealth());
         else if (hp == 0)
-            game.displayStatus("Player LOW HEALTH: " + hp + "/" + getMaxHealth());
+            s.append("Player LOW HEALTH: " + hp + "/" + getMaxHealth());
         else
-            game.displayStatus("Player died!");
+            s.append("Player died!");
 
-
+        if (myItem == null) {
+            s.append(" [NO ITEMS]");
+        } else {
+            s.append(" ["+myItem.getName()+"]");
+        }
+        game.displayStatus(s.toString());
     }
 
     /**
@@ -119,6 +134,33 @@ public class Player implements IPlayer {
         for (IItem item : hinders)
             foundWall |= item instanceof Wall;
         return foundWall;
+    }
+
+    void pickUp(IGame game) {
+        if (myItem != null) {
+            game.displayMessage("You already carry a " + myItem.getName());
+            return;
+        }
+
+        List<IItem> items = game.getLocalItems();
+        for (IItem item : items)
+            if (!(item instanceof Dust)) {
+                myItem = game.pickUp(item);
+                if (myItem == null)
+                    game.displayMessage("Pickup failed!");
+                else
+                    game.displayMessage("You picked up a " + myItem.getName());
+                break;
+            }
+    }
+
+    void drop(IGame game) {
+        if (myItem == null) {
+            game.displayMessage("You have nothing to drop");
+            return;
+        }
+        game.drop(myItem);
+        myItem = null;
     }
 
     @Override
