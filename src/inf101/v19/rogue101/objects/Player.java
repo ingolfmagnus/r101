@@ -48,9 +48,77 @@ public class Player implements IPlayer {
         }
     }
 
+    /**
+     * React to keypress
+     * @param game The game engine object
+     * @param key The key that has been pressed
+     */
     @Override
     public void keyPressed(IGame game, KeyCode key) {
+        if (key == KeyCode.LEFT) {
+            tryToMove(game, GridDirection.WEST);
 
+        }
+        else if (key == KeyCode.UP) {
+            tryToMove(game, GridDirection.NORTH);
+
+        }
+        else if (key == KeyCode.RIGHT) {
+            tryToMove(game, GridDirection.EAST);
+
+        }
+        else if (key == KeyCode.DOWN) {
+            tryToMove(game, GridDirection.SOUTH);
+
+        }
+        showStatus(game);
+    }
+
+    /**
+     * Show status/health info
+     * @param game The game engine object
+     */
+    private void showStatus(IGame game) {
+        if (hp > 0)
+            game.displayStatus("Player health: " + hp + "/" + getMaxHealth());
+        else if (hp == 0)
+            game.displayStatus("Player LOW HEALTH: " + hp + "/" + getMaxHealth());
+        else
+            game.displayStatus("Player died!");
+
+
+    }
+
+    /**
+     * Try to move in the indicated direction
+     * @param game
+     * @param direction
+     * @return True on successful move
+     */
+    private boolean tryToMove(IGame game, GridDirection direction) {
+        boolean canMove = game.getPossibleMoves().contains(direction);
+        if (canMove)
+            game.move(direction);
+        else {
+            game.displayMessage("Ouch!");
+            if(hitWall(game, direction))
+                hp--;
+        }
+        return canMove;
+    }
+
+    /**
+     * Check if we hit a wall in a direction
+     * @param game The game engine object
+     * @param direction The desired direction
+     * @return True if a Wall was found
+     */
+    private boolean hitWall(IGame game, GridDirection direction) {
+        boolean foundWall = false;
+        List<IItem> hinders = game.getMap().getItems(game.getLocation(direction));
+        for (IItem item : hinders)
+            foundWall |= item instanceof Wall;
+        return foundWall;
     }
 
     @Override
