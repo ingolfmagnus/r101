@@ -65,12 +65,12 @@ public class Main extends Application {
                 }
             });
         bigStepTimeline.getKeyFrames().add(kf);
-        // bigStepTimeline.playFromStart();
+        bigStepTimeline.playFromStart();
 
         //
         smallStepTimeline = new Timeline();
         smallStepTimeline.setCycleCount(1);
-        kf = new KeyFrame(Duration.millis(300), (ActionEvent event) -> {
+        kf = new KeyFrame(Duration.millis(1), (ActionEvent event) -> {
                 doTurn();
             });
         smallStepTimeline.getKeyFrames().add(kf);
@@ -118,8 +118,8 @@ public class Main extends Application {
             System.out.println("doTurn()+draw() took " + (System.currentTimeMillis() - t) + "ms");
             System.out.println("waiting for player? " + waitForPlayer);
         }
-        if (!waitForPlayer)
-            smallStepTimeline.playFromStart(); // this will kickstart a new turn in a few milliseconds
+        // if (!waitForPlayer)
+        //    smallStepTimeline.playFromStart(); // this will kickstart a new turn in a few milliseconds
     }
 
     public static String BUILTIN_MAP = "40 20\n" //
