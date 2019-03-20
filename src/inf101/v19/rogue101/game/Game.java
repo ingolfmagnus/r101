@@ -129,67 +129,57 @@ public class Game implements IGame {
      */
     public boolean doTurn() {
         doCarrotPlanting(20);
-        do {
-            if (actors.isEmpty()) {
-                System.err.println("new turn!");
+        beginTurn();
+        // Do the Carrots turns:
+        for (Carrot carrotItem : carrots) {
+            carrotItem.doTurn(this);
+        }
 
-                // no one in the queue, we're starting a new turn!
-                // first collect all the actors:
-                beginTurn();
+        // process actors one by one; for the IPlayer, we return and wait for keypresses
+        // Possible TODO: for INonPlayer, we could also return early (returning
+        // *false*), and then insert a little timer delay between each non-player move
+        // (the timer
+        // is already set up in Main)
+        while (!actors.isEmpty()) {
+            // get the next player or non-player in the queue
+            currentActor = actors.remove(0);
+            if (currentActor.isDestroyed()) // skip if it's dead
+                continue;
+            currentLocation = map.getLocation(currentActor);
+            if (currentLocation == null) {
+                displayDebug("doTurn(): Whoops! Actor has disappeared from the map: " + currentActor);
             }
+            movePoints = 1; // everyone gets to do one thing
 
-            // Do the Carrots turns:
-            for (Carrot carrotItem : carrots){
-                carrotItem.doTurn(this);
-            }
-
-            // process actors one by one; for the IPlayer, we return and wait for keypresses
-            // Possible TODO: for INonPlayer, we could also return early (returning
-            // *false*), and then insert a little timer delay between each non-player move
-            // (the timer
-            // is already set up in Main)
-            while (!actors.isEmpty()) {
-                // get the next player or non-player in the queue
-                currentActor = actors.remove(0);
-                if (currentActor.isDestroyed()) // skip if it's dead
-                    continue;
-                currentLocation = map.getLocation(currentActor);
-                if (currentLocation == null) {
-                    displayDebug("doTurn(): Whoops! Actor has disappeared from the map: " + currentActor);
-                }
-                movePoints = 1; // everyone gets to do one thing
-
-                if (currentActor instanceof INonPlayer) {
-                    // computer-controlled players do their stuff right away
-                    ((INonPlayer) currentActor).doTurn(this);
-                    // remove any dead items from current location
-                    map.clean(currentLocation);
-                } else if (currentActor instanceof IPlayer) {
-                    if (currentActor.isDestroyed()) {
-                        // a dead human player gets removed from the game
-                        // TODO: you might want to be more clever here
-                        displayMessage("YOU DIE!!!");
-                        map.remove(currentLocation, currentActor);
-                        currentActor = null;
-                        currentLocation = null;
-                    } else {
-                        // For the human player, we need to wait for input, so we just return.
-                        // Further keypresses will cause keyPressed() to be called, and once the human
-                        // makes a move, it'll lose its movement point and doTurn() will be called again
-                        //
-                        // NOTE: currentActor and currentLocation are set to the IPlayer (above),
-                        // so the game remembers who the player is whenever new keypresses occur. This
-                        // is also how e.g., getLocalItems() work – the game always keeps track of
-                        // whose turn it is.
-                        ((IPlayer)currentActor).keyPressed(this, lastKeyCode);
-                        //return true;
-                    }
+            if (currentActor instanceof INonPlayer) {
+                // computer-controlled players do their stuff right away
+                ((INonPlayer) currentActor).doTurn(this);
+                // remove any dead items from current location
+                map.clean(currentLocation);
+            } else if (currentActor instanceof IPlayer) {
+                if (currentActor.isDestroyed()) {
+                    // a dead human player gets removed from the game
+                    // TODO: you might want to be more clever here
+                    displayMessage("YOU DIE!!!");
+                    map.remove(currentLocation, currentActor);
+                    currentActor = null;
+                    currentLocation = null;
                 } else {
-                    displayDebug("doTurn(): Hmm, this is a very strange actor: " + currentActor);
+                    // For the human player, we need to wait for input, so we just return.
+                    // Further keypresses will cause keyPressed() to be called, and once the human
+                    // makes a move, it'll lose its movement point and doTurn() will be called again
+                    //
+                    // NOTE: currentActor and currentLocation are set to the IPlayer (above),
+                    // so the game remembers who the player is whenever new keypresses occur. This
+                    // is also how e.g., getLocalItems() work – the game always keeps track of
+                    // whose turn it is.
+                    ((IPlayer) currentActor).keyPressed(this, lastKeyCode);
+                    //return true;
                 }
+            } else {
+                displayDebug("doTurn(): Hmm, this is a very strange actor: " + currentActor);
             }
-        } while (false); //(numPlayers > 0); // we can safely repeat if we have players, since we'll return (and break out of
-        // the loop) once we hit the player
+        }
         lastKeyCode = null;
         return true;
     }
