@@ -70,7 +70,7 @@ public class Main extends Application {
         //
         smallStepTimeline = new Timeline();
         smallStepTimeline.setCycleCount(1);
-        kf = new KeyFrame(Duration.millis(1), (ActionEvent event) -> {
+        kf = new KeyFrame(Duration.millis(300), (ActionEvent event) -> {
                 doTurn();
             });
         smallStepTimeline.getKeyFrames().add(kf);

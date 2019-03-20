@@ -24,10 +24,10 @@ public class Rabbit implements INonPlayer {
 
         for (IItem item : game.getLocalItems()) {
             if (item instanceof Carrot) {
-                System.out.println("found carrot!");
+                // System.out.println("found carrot!");
                 int eaten = item.handleDamage(game, this, 5);
                 if (eaten > 0) {
-                    System.out.println("ate carrot worth " + eaten + "!");
+                    // System.out.println("ate carrot worth " + eaten + "!");
                     food += eaten;
                     game.displayMessage("You hear a faint crunching (" + getName() + " eats " + item.getArticle() + " "
                                         + item.getName() + ")");

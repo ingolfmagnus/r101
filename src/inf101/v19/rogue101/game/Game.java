@@ -48,6 +48,7 @@ public class Game implements IGame {
     private final Printer printer;
     private int numPlayers = 0;
     private List<Carrot> carrots = new ArrayList<>();
+    private KeyCode lastKeyCode;
 
     public Game(Screen screen, ITurtle painter, Printer printer) {
         this.painter = painter;
@@ -130,7 +131,7 @@ public class Game implements IGame {
         doCarrotPlanting(20);
         do {
             if (actors.isEmpty()) {
-                // System.err.println("new turn!");
+                System.err.println("new turn!");
 
                 // no one in the queue, we're starting a new turn!
                 // first collect all the actors:
@@ -180,14 +181,16 @@ public class Game implements IGame {
                         // so the game remembers who the player is whenever new keypresses occur. This
                         // is also how e.g., getLocalItems() work – the game always keeps track of
                         // whose turn it is.
-                        return true;
+                        ((IPlayer)currentActor).keyPressed(this, lastKeyCode);
+                        //return true;
                     }
                 } else {
                     displayDebug("doTurn(): Hmm, this is a very strange actor: " + currentActor);
                 }
             }
-        } while (numPlayers > 0); // we can safely repeat if we have players, since we'll return (and break out of
+        } while (false); //(numPlayers > 0); // we can safely repeat if we have players, since we'll return (and break out of
         // the loop) once we hit the player
+        lastKeyCode = null;
         return true;
     }
 
@@ -269,7 +272,9 @@ public class Game implements IGame {
         case "C":
             return new Carrot();
         case "@":
-            return new Player();
+            return new Player(Player.MULTIPLAYER.A);
+        case "&":
+            return new Player(Player.MULTIPLAYER.B);
         case " ":
             return null;
         default:
@@ -298,14 +303,14 @@ public class Game implements IGame {
         // TODO: you can save the last three lines, and display/scroll them
         printer.clearLine(Main.LINE_MSG1);
         printer.printAt(1, Main.LINE_MSG1, s);
-        System.out.println("Message: «" + s + "»");
+        // System.out.println("Message: «" + s + "»");
     }
 
     @Override
     public void displayStatus(String s) {
         printer.clearLine(Main.LINE_STATUS);
         printer.printAt(1, Main.LINE_STATUS, s);
-        System.out.println("Status: «" + s + "»");
+        // System.out.println("Status: «" + s + "»");
     }
 
     public void draw() {
@@ -394,11 +399,12 @@ public class Game implements IGame {
     public void keyPressed(KeyCode code) {
         // only an IPlayer/human can handle keypresses, and only if it's the human's
         // turn
-        if (currentActor instanceof IPlayer) {
-            ((IPlayer) currentActor).keyPressed(this, code); // do your thing
-            if (movePoints <= 0)
-                doTurn(); // proceed with turn if we're out of moves
-        }
+        //if (currentActor instanceof IPlayer) {
+        //    ((IPlayer) currentActor).keyPressed(this, code); // do your thing
+            //if (movePoints <= 0)
+            //    doTurn(); // proceed with turn if we're out of moves
+        //}
+    lastKeyCode = code;
     }
 
     @Override

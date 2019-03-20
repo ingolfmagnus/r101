@@ -13,7 +13,42 @@ public class Player implements IPlayer {
     private int food = 0;
     private int hp = getMaxHealth();
     private IItem myItem;
+    private String symbol = "@";
 
+
+    public enum  MULTIPLAYER{A,B;};
+    private KeyCode keyNorth, keyWest, keySouth, keyEast, keyPickup, keyDrop;
+    private MULTIPLAYER index;
+    public Player(MULTIPLAYER anIndex) {
+        index = anIndex;
+        switch (anIndex) {
+            case A :
+                keyNorth = KeyCode.UP;
+                keyWest = KeyCode.LEFT;
+                keySouth = KeyCode.DOWN;
+                keyEast = KeyCode.RIGHT;
+                keyPickup = KeyCode.PAGE_UP;
+                keyDrop = KeyCode.PAGE_DOWN;
+                break;
+            case B:
+                keyNorth = KeyCode.W;
+                keyWest = KeyCode.A;
+                keySouth = KeyCode.S;
+                keyEast = KeyCode.D;
+                keyPickup = KeyCode.U;
+                keyDrop = KeyCode.J;
+                symbol = "&";
+                break;
+        }
+    }
+
+    public Player() {
+        this(MULTIPLAYER.A);
+    }
+
+    public MULTIPLAYER getIndex() {
+        return index;
+    }
 
     public void doTurn(IGame game) {
         if (food == 0)
@@ -56,27 +91,27 @@ public class Player implements IPlayer {
      */
     @Override
     public void keyPressed(IGame game, KeyCode key) {
-        if (key == KeyCode.LEFT) {
+        if (key == keyWest) {
             tryToMove(game, GridDirection.WEST);
 
         }
-        else if (key == KeyCode.UP) {
+        else if (key == keyNorth) {
             tryToMove(game, GridDirection.NORTH);
 
         }
-        else if (key == KeyCode.RIGHT) {
+        else if (key == keyEast) {
             tryToMove(game, GridDirection.EAST);
 
         }
-        else if (key == KeyCode.DOWN) {
+        else if (key == keySouth) {
             tryToMove(game, GridDirection.SOUTH);
 
         }
-        else if (key == KeyCode.PAGE_UP) {
+        else if (key == keyPickup) {
             pickUp(game);
 
         }
-        else if (key == KeyCode.PAGE_DOWN) {
+        else if (key == keyDrop) {
             drop(game);
 
         }
@@ -205,7 +240,7 @@ public class Player implements IPlayer {
 
     @Override
     public String getSymbol() {
-        return hp > 0 ? "@" : "o";
+        return hp > 0 ? symbol : "o";
     }
 
     @Override
