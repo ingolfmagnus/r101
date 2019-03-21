@@ -47,7 +47,7 @@ public class Main extends Application {
     private Game game;
 
     private boolean grid = MAIN_USE_BACKGROUND_GRID;
-    private boolean autoNextTurn = false;
+    private boolean autoNextTurn = true;
     private Timeline bigStepTimeline;
     private Timeline smallStepTimeline;
 
@@ -118,7 +118,7 @@ public class Main extends Application {
             System.out.println("doTurn()+draw() took " + (System.currentTimeMillis() - t) + "ms");
             System.out.println("waiting for player? " + waitForPlayer);
         }
-        // if (!waitForPlayer)
+        //if (!waitForPlayer)
         //    smallStepTimeline.playFromStart(); // this will kickstart a new turn in a few milliseconds
     }
 
